@@ -1,0 +1,68 @@
+#!/bin/bash
+set -e -x
+exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
+
+# -----------------------------------------------------------------------------
+#  BASE INSTALL
+# -----------------------------------------------------------------------------
+
+readonly CONFIG_DIR=/opt/snowplow/config
+
+function install_docker_ce() {
+  sudo yum install -y docker-20.10.4-1.amzn2
+  sudo systemctl enable docker
+  sudo systemctl start docker
+  sudo usermod -a -G docker ec2-user
+}
+
+install_docker_ce
+
+sudo mkdir -p $${CONFIG_DIR}
+sudo cat << EOF > $${CONFIG_DIR}/iglu-server.hocon
+${config}
+EOF
+
+# Run the server setup
+set +e
+sudo docker run \
+  -d \
+  --name iglu-server-setup \
+  --network host \
+  -v $${CONFIG_DIR}:/snowplow/config \
+  -e 'JAVA_OPTS=-Dorg.slf4j.simpleLogger.defaultLogLevel=info' \
+  snowplow/iglu-server:${version} \
+  setup --config /snowplow/config/iglu-server.hocon
+set -e
+
+# Launch the server
+sudo docker run \
+  -d \
+  --name iglu-server \
+  --restart always \
+  --network host \
+  --log-opt max-size=10m \
+  --log-opt max-file=5 \
+  -v $${CONFIG_DIR}:/snowplow/config \
+  -p ${port}:${port} \
+  -e 'JAVA_OPTS=-Dorg.slf4j.simpleLogger.defaultLogLevel=info' \
+  snowplow/iglu-server:${version} \
+  --config /snowplow/config/iglu-server.hocon
+
+# Install the super api-key
+sudo cat << EOF > $${CONFIG_DIR}/super-api-key.sql
+INSERT INTO iglu_permissions(apikey, vendor, wildcard, schema_action, key_action)
+  VALUES ('${super_api_key}', '', 'TRUE', 'CREATE_VENDOR'::schema_action, '{"CREATE", "DELETE"}'::key_action[])
+  ON CONFLICT DO NOTHING;
+EOF
+
+sudo docker run \
+  -d \
+  --name iglu-server-api-key \
+  --network host \
+  -v $${CONFIG_DIR}:/snowplow/config \
+  -e 'PGUSER=${db_username}' \
+  -e 'PGPASSWORD=${db_password}' \
+  postgres:13 \
+  psql -h ${db_host} -d ${db_name} -p ${db_port} -f /snowplow/config/super-api-key.sql
+
+${telemetry_script}
