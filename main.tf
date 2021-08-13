@@ -17,9 +17,12 @@ locals {
     var.tags,
     local.local_tags
   )
+
+  cloudwatch_log_group_name = "/aws/ec2/${var.name}"
 }
 
 data "aws_region" "current" {}
+data "aws_caller_identity" "current" {}
 
 module "telemetry" {
   source  = "snowplow-devops/telemetry/snowplow"
@@ -55,6 +58,73 @@ data "aws_ami" "amazon_linux_2" {
   }
 
   owners = ["amazon"]
+}
+
+# --- CloudWatch: Logging
+
+resource "aws_cloudwatch_log_group" "log_group" {
+  count = var.cloudwatch_logs_enabled ? 1 : 0
+
+  name              = local.cloudwatch_log_group_name
+  retention_in_days = var.cloudwatch_logs_retention_days
+
+  tags = local.tags
+}
+
+# --- IAM: Roles & Permissions
+
+resource "aws_iam_role" "iam_role" {
+  name        = var.name
+  description = "Allows the Iglu Server nodes to access required services"
+  tags        = local.tags
+
+  assume_role_policy = <<EOF
+{
+  "Version" : "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": { "Service": [ "ec2.amazonaws.com" ]},
+      "Action": [ "sts:AssumeRole" ]
+    }
+  ]
+}
+EOF
+
+  permissions_boundary = var.iam_permissions_boundary
+}
+
+resource "aws_iam_policy" "iam_policy" {
+  name = var.name
+
+  policy = <<EOF
+{
+  "Version" : "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "logs:PutLogEvents",
+        "logs:CreateLogStream",
+        "logs:DescribeLogStreams"
+      ],
+      "Resource": [
+        "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${local.cloudwatch_log_group_name}:*"
+      ]
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "policy_attachment" {
+  role       = aws_iam_role.iam_role.name
+  policy_arn = aws_iam_policy.iam_policy.arn
+}
+
+resource "aws_iam_instance_profile" "instance_profile" {
+  name = var.name
+  role = aws_iam_role.iam_role.name
 }
 
 # --- EC2: Security Group Rules
@@ -171,17 +241,21 @@ locals {
     super_api_key = lower(var.super_api_key)
 
     telemetry_script = join("", module.telemetry.*.amazon_linux_2_user_data)
+
+    cloudwatch_logs_enabled   = var.cloudwatch_logs_enabled
+    cloudwatch_log_group_name = local.cloudwatch_log_group_name
   })
 }
 
 resource "aws_launch_configuration" "lc" {
   name_prefix = "${var.name}-"
 
-  image_id        = var.amazon_linux_2_ami_id == "" ? data.aws_ami.amazon_linux_2.id : var.amazon_linux_2_ami_id
-  instance_type   = var.instance_type
-  key_name        = var.ssh_key_name
-  security_groups = [aws_security_group.sg.id]
-  user_data       = local.user_data
+  image_id             = var.amazon_linux_2_ami_id == "" ? data.aws_ami.amazon_linux_2.id : var.amazon_linux_2_ami_id
+  instance_type        = var.instance_type
+  key_name             = var.ssh_key_name
+  iam_instance_profile = aws_iam_instance_profile.instance_profile.name
+  security_groups      = [aws_security_group.sg.id]
+  user_data            = local.user_data
 
   # Note: Required if deployed in a public subnet
   associate_public_ip_address = var.associate_public_ip_address
