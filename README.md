@@ -1,4 +1,4 @@
-[![Release][release-image]][release] [![CI][ci-image]][ci] [![License][license-image]][license] [![Registry][registry-image]][registry]
+[![Release][release-image]][release] [![CI][ci-image]][ci] [![License][license-image]][license] [![Registry][registry-image]][registry] [![Source][source-image]][source]
 
 # terraform-aws-iglu-server-ec2
 
@@ -178,3 +178,6 @@ limitations under the License.
 
 [registry]: https://registry.terraform.io/modules/snowplow-devops/iglu-server-ec2/aws/latest
 [registry-image]: https://img.shields.io/static/v1?label=Terraform&message=Registry&color=7B42BC&logo=terraform
+
+[source]: https://github.com/snowplow-incubator/iglu-server
+[source-image]: https://img.shields.io/static/v1?label=Snowplow&message=Iglu%20Server&color=0E9BA4&logo=GitHub
