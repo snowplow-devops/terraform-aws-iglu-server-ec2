@@ -3,7 +3,7 @@ locals {
   module_version = "0.1.1"
 
   app_name    = "iglu-server"
-  app_version = "0.6.2"
+  app_version = "0.7.0"
 
   local_tags = {
     Name           = var.name
@@ -26,7 +26,7 @@ data "aws_caller_identity" "current" {}
 
 module "telemetry" {
   source  = "snowplow-devops/telemetry/snowplow"
-  version = "0.1.0"
+  version = "0.2.0"
 
   count = var.telemetry_enabled ? 1 : 0
 
@@ -227,18 +227,18 @@ locals {
     db_username     = var.db_username
     db_password     = var.db_password
     patches_allowed = var.patches_allowed
+    super_api_key   = lower(var.super_api_key)
   })
 
   user_data = templatefile("${path.module}/templates/user-data.sh.tmpl", {
-    port          = var.ingress_port
-    config        = local.iglu_server_hocon
-    version       = local.app_version
-    db_host       = var.db_host
-    db_port       = var.db_port
-    db_name       = var.db_name
-    db_username   = var.db_username
-    db_password   = var.db_password
-    super_api_key = lower(var.super_api_key)
+    port        = var.ingress_port
+    config      = local.iglu_server_hocon
+    version     = local.app_version
+    db_host     = var.db_host
+    db_port     = var.db_port
+    db_name     = var.db_name
+    db_username = var.db_username
+    db_password = var.db_password
 
     telemetry_script = join("", module.telemetry.*.amazon_linux_2_user_data)
 
@@ -274,7 +274,7 @@ resource "aws_launch_configuration" "lc" {
 
 module "tags" {
   source  = "snowplow-devops/tags/aws"
-  version = "0.1.0"
+  version = "0.1.1"
 
   tags = local.tags
 }
