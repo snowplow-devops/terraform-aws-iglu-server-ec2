@@ -29,7 +29,6 @@ EOF
 # Run the server setup
 set +e
 sudo docker run \
-  -d \
   --name iglu-server-setup \
   --network host \
 %{ if cloudwatch_logs_enabled ~}
@@ -62,27 +61,5 @@ sudo docker run \
   -e 'JAVA_OPTS=-Dorg.slf4j.simpleLogger.defaultLogLevel=info' \
   snowplow/iglu-server:${version} \
   --config /snowplow/config/iglu-server.hocon
-
-# Install the super api-key
-sudo cat << EOF > $${CONFIG_DIR}/super-api-key.sql
-INSERT INTO iglu_permissions(apikey, vendor, wildcard, schema_action, key_action)
-  VALUES ('${super_api_key}', '', 'TRUE', 'CREATE_VENDOR'::schema_action, '{"CREATE", "DELETE"}'::key_action[])
-  ON CONFLICT DO NOTHING;
-EOF
-
-sudo docker run \
-  -d \
-  --name iglu-server-api-key \
-  --network host \
-%{ if cloudwatch_logs_enabled ~}
-  --log-driver awslogs \
-  --log-opt awslogs-group=${cloudwatch_log_group_name} \
-  --log-opt awslogs-stream=$(get_instance_id) \
-%{ endif ~}
-  -v $${CONFIG_DIR}:/snowplow/config \
-  -e 'PGUSER=${db_username}' \
-  -e 'PGPASSWORD=${db_password}' \
-  postgres:13 \
-  psql -h ${db_host} -d ${db_name} -p ${db_port} -f /snowplow/config/super-api-key.sql
 
 ${telemetry_script}
