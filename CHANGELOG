@@ -1,3 +1,8 @@
+Version 0.2.0 (2021-08-30)
+--------------------------
+Update Iglu Server to v0.7.0 (#7)
+Leverage CloudWatch Logs as default (#8)
+
 Version 0.1.1 (2021-08-13)
 --------------------------
 Update License badge to use HTTPS (#1)
