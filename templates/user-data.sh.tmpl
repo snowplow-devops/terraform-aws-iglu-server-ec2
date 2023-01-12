@@ -37,7 +37,7 @@ sudo docker run \
   --log-opt awslogs-stream=$(get_instance_id) \
 %{ endif ~}
   -v $${CONFIG_DIR}:/snowplow/config \
-  -e 'JAVA_OPTS=-Dorg.slf4j.simpleLogger.defaultLogLevel=info' \
+  -e 'JAVA_OPTS=${java_opts}' \
   snowplow/iglu-server:${version} \
   setup --config /snowplow/config/iglu-server.hocon
 set -e
@@ -48,6 +48,7 @@ sudo docker run \
   --name iglu-server \
   --restart always \
   --network host \
+  --memory=${container_memory} \
 %{ if cloudwatch_logs_enabled ~}
   --log-driver awslogs \
   --log-opt awslogs-group=${cloudwatch_log_group_name} \
@@ -58,7 +59,7 @@ sudo docker run \
 %{ endif ~}
   -v $${CONFIG_DIR}:/snowplow/config \
   -p ${port}:${port} \
-  -e 'JAVA_OPTS=-Dorg.slf4j.simpleLogger.defaultLogLevel=info' \
+  -e 'JAVA_OPTS=${java_opts}' \
   snowplow/iglu-server:${version} \
   --config /snowplow/config/iglu-server.hocon
 
