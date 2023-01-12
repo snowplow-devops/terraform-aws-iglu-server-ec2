@@ -1,3 +1,8 @@
+Version 0.3.0 (2023-01-12)
+--------------------------
+Increase memory allocation for application (#12)
+Bump version to 0.8.7 (#13)
+
 Version 0.2.0 (2021-08-30)
 --------------------------
 Update Iglu Server to v0.7.0 (#7)
