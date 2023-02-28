@@ -1,3 +1,8 @@
+Version 0.4.0 (2023-02-28)
+--------------------------
+Use service module and leverage IMDSv2 (#15)
+Bump app_version to 0.9.0 (#16)
+
 Version 0.3.0 (2023-01-12)
 --------------------------
 Increase memory allocation for application (#12)
