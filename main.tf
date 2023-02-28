@@ -3,7 +3,7 @@ locals {
   module_version = "0.3.0"
 
   app_name    = "iglu-server"
-  app_version = "0.8.7"
+  app_version = "0.9.0"
 
   local_tags = {
     Name           = var.name
