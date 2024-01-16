@@ -1,6 +1,6 @@
 locals {
   module_name    = "iglu-server-ec2"
-  module_version = "0.4.3"
+  module_version = "0.4.4"
 
   app_name    = "iglu-server"
   app_version = "0.10.0"
@@ -238,7 +238,7 @@ locals {
 
 module "service" {
   source  = "snowplow-devops/service-ec2/aws"
-  version = "0.2.0"
+  version = "0.2.1"
 
   user_supplied_script = local.user_data
   name                 = var.name
