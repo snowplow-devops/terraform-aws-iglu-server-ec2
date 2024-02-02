@@ -17,6 +17,7 @@ sudo docker run \
 %{ endif ~}
   -v $${CONFIG_DIR}:/snowplow/config \
   -e 'JAVA_OPTS=${java_opts}' \
+  -e 'ACCEPT_LIMITED_USE_LICENSE=${accept_limited_use_license}' \
   snowplow/iglu-server:${version} \
   setup --config /snowplow/config/iglu-server.hocon
 set -e
@@ -39,6 +40,7 @@ sudo docker run \
   -v $${CONFIG_DIR}:/snowplow/config \
   -p ${port}:${port} \
   -e 'JAVA_OPTS=${java_opts}' \
+  -e 'ACCEPT_LIMITED_USE_LICENSE=${accept_limited_use_license}' \
   snowplow/iglu-server:${version} \
   --config /snowplow/config/iglu-server.hocon
 
