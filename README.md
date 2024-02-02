@@ -59,6 +59,8 @@ module "iglu_lb" {
 module "iglu_server" {
   source = "snowplow-devops/iglu-server-ec2/aws"
 
+  accept_limited_use_license = true
+
   name                 = "iglu-server"
   vpc_id               = var.vpc_id
   subnet_ids           = var.subnet_ids
@@ -138,6 +140,7 @@ module "iglu_server" {
 | <a name="input_subnet_ids"></a> [subnet\_ids](#input\_subnet\_ids) | The list of subnets to deploy the Iglu Server across | `list(string)` | n/a | yes |
 | <a name="input_super_api_key"></a> [super\_api\_key](#input\_super\_api\_key) | A UUIDv4 string to use as the master API key for Iglu Server management | `string` | n/a | yes |
 | <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | The VPC to deploy the Iglu Server within | `string` | n/a | yes |
+| <a name="input_accept_limited_use_license"></a> [accept\_limited\_use\_license](#input\_accept\_limited\_use\_license) | Acceptance of the SLULA terms (https://docs.snowplow.io/limited-use-license-1.0/) | `bool` | `false` | no |
 | <a name="input_amazon_linux_2_ami_id"></a> [amazon\_linux\_2\_ami\_id](#input\_amazon\_linux\_2\_ami\_id) | The AMI ID to use which must be based of of Amazon Linux 2; by default the latest community version is used | `string` | `""` | no |
 | <a name="input_associate_public_ip_address"></a> [associate\_public\_ip\_address](#input\_associate\_public\_ip\_address) | Whether to assign a public ip address to this instance | `bool` | `true` | no |
 | <a name="input_cloudwatch_logs_enabled"></a> [cloudwatch\_logs\_enabled](#input\_cloudwatch\_logs\_enabled) | Whether application logs should be reported to CloudWatch | `bool` | `true` | no |
@@ -170,16 +173,9 @@ module "iglu_server" {
 
 # Copyright and license
 
-The Terraform AWS Iglu Server on EC2 project is Copyright 2021-2023 Snowplow Analytics Ltd.
+Copyright 2021-current Snowplow Analytics Ltd.
 
-Licensed under the [Apache License, Version 2.0][license] (the "License");
-you may not use this software except in compliance with the License.
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+Licensed under the [Snowplow Limited Use License Agreement][license]. _(If you are uncertain how it applies to your use case, check our answers to [frequently asked questions][license-faq].)_
 
 [release]: https://github.com/snowplow-devops/terraform-aws-iglu-server-ec2/releases/latest
 [release-image]: https://img.shields.io/github/v/release/snowplow-devops/terraform-aws-iglu-server-ec2
@@ -187,8 +183,9 @@ limitations under the License.
 [ci]: https://github.com/snowplow-devops/terraform-aws-iglu-server-ec2/actions?query=workflow%3Aci
 [ci-image]: https://github.com/snowplow-devops/terraform-aws-iglu-server-ec2/workflows/ci/badge.svg
 
-[license]: https://www.apache.org/licenses/LICENSE-2.0
-[license-image]: https://img.shields.io/badge/license-Apache--2-blue.svg?style=flat
+[license]: https://docs.snowplow.io/limited-use-license-1.0/
+[license-image]: https://img.shields.io/badge/license-Snowplow--Limited--Use-blue.svg?style=flat
+[license-faq]: https://docs.snowplow.io/docs/contributing/limited-use-license-faq/
 
 [registry]: https://registry.terraform.io/modules/snowplow-devops/iglu-server-ec2/aws/latest
 [registry-image]: https://img.shields.io/static/v1?label=Terraform&message=Registry&color=7B42BC&logo=terraform
