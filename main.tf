@@ -3,7 +3,7 @@ locals {
   module_version = "0.4.4"
 
   app_name    = "iglu-server"
-  app_version = "0.10.0"
+  app_version = var.app_version
 
   local_tags = {
     Name           = var.name
@@ -26,7 +26,7 @@ data "aws_caller_identity" "current" {}
 
 module "telemetry" {
   source  = "snowplow-devops/telemetry/snowplow"
-  version = "0.4.0"
+  version = "0.5.0"
 
   count = var.telemetry_enabled ? 1 : 0
 
@@ -220,7 +220,7 @@ locals {
     accept_limited_use_license = var.accept_limited_use_license
 
     port        = var.ingress_port
-    config      = local.iglu_server_hocon
+    config_b64  = base64encode(local.iglu_server_hocon)
     version     = local.app_version
     db_host     = var.db_host
     db_port     = var.db_port
