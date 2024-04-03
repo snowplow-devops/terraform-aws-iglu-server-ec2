@@ -1,3 +1,7 @@
+Version 0.5.1 (2024-04-03)
+--------------------------
+Add support for AWS China regions (#29)
+
 Version 0.5.0 (2024-02-02)
 --------------------------
 Update LICENSE to SLULA (#25)
