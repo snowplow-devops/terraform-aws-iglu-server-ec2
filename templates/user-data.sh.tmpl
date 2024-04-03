@@ -5,6 +5,10 @@ sudo base64 --decode << EOF > $${CONFIG_DIR}/iglu-server.hocon
 ${config_b64}
 EOF
 
+%{ if is_private_ecr_registry }
+aws ecr get-login-password --region ${region} | docker login --username AWS --password-stdin ${private_ecr_registry}
+%{ endif ~}
+
 # Run the server setup
 set +e
 sudo docker run \
@@ -18,7 +22,7 @@ sudo docker run \
   --mount type=bind,source=$${CONFIG_DIR},target=/snowplow/config \
   --env JDK_JAVA_OPTIONS='${java_opts}' \
   --env ACCEPT_LIMITED_USE_LICENSE=${accept_limited_use_license} \
-  snowplow/iglu-server:${version} \
+  ${private_ecr_registry}snowplow/iglu-server:${version} \
   setup --config /snowplow/config/iglu-server.hocon
 set -e
 
@@ -41,7 +45,7 @@ sudo docker run \
   --env JDK_JAVA_OPTIONS='${java_opts}' \
   --env ACCEPT_LIMITED_USE_LICENSE=${accept_limited_use_license} \
   -p ${port}:${port} \
-  snowplow/iglu-server:${version} \
+  ${private_ecr_registry}snowplow/iglu-server:${version} \
   --config /snowplow/config/iglu-server.hocon
 
 ${telemetry_script}
