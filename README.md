@@ -185,7 +185,7 @@ Licensed under the [Snowplow Limited Use License Agreement][license]. _(If you a
 [ci]: https://github.com/snowplow-devops/terraform-aws-iglu-server-ec2/actions?query=workflow%3Aci
 [ci-image]: https://github.com/snowplow-devops/terraform-aws-iglu-server-ec2/workflows/ci/badge.svg
 
-[license]: https://docs.snowplow.io/limited-use-license-1.0/
+[license]: https://docs.snowplow.io/limited-use-license-1.1/
 [license-image]: https://img.shields.io/badge/license-Snowplow--Limited--Use-blue.svg?style=flat
 [license-faq]: https://docs.snowplow.io/docs/contributing/limited-use-license-faq/
 
