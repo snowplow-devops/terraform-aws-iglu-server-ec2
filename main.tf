@@ -1,6 +1,6 @@
 locals {
   module_name    = "iglu-server-ec2"
-  module_version = "0.6.0"
+  module_version = "0.6.1"
 
   app_name    = "iglu-server"
   app_version = var.app_version
